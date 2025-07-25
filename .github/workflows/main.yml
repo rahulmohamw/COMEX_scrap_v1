@@ -3,10 +3,11 @@
 name: Daily COMEX Copper Data Scraper
 
 on:
-  # Schedule the workflow to run every day at 6:45 AM IST
-  schedule:
-    - cron: '30 18 * * *'
-  # Allows you to run this workflow manually from the Actions tab
+  # This makes the workflow listen for an external API request
+  repository_dispatch:
+    types: [daily-scrape] # You can name this event type anything you like
+  
+  # Keep this so you can still run it manually for testing
   workflow_dispatch:
 
 jobs:
