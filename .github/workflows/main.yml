@@ -1,0 +1,52 @@
+# .github/workflows/scheduled_scraper.yml
+
+name: Daily COMEX Copper Data Scraper
+
+on:
+  # Schedule the workflow to run every day at 6:45 AM UTC
+  schedule:
+    - cron: '45 6 * * *'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  scrape_and_commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out your repository code
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up a Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # You can specify any version you prefer
+
+      # Step 3: Install the required Python packages from requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Run the scraper.py script to update the CSV file
+      - name: Run Python scraper
+        run: python scraper.py
+
+      # Step 5: Commit the updated CSV file back to your repository
+      - name: Commit and push if there are changes
+        run: |
+          # Configure Git for the Actions bot
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Add the updated data file to the staging area
+          git add comex_copper_historical_data.csv
+          
+          # Commit the changes if any files were staged.
+          # The "git diff" command will exit with a non-zero status if there are changes.
+          git diff --staged --quiet || git commit -m "Update COMEX copper data for $(date +'%Y-%m-%d')"
+          
+          # Push the new commit to the main branch
+          git push
