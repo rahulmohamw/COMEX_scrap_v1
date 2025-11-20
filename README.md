@@ -1,2 +1,2 @@
 # COMEX_scrap_v1
-Update - 27.08.25
+Update - 20.11.25
